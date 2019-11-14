@@ -149,3 +149,35 @@ Norgen_Separate <- VAN_rep %>%
 Norgen_Separate %>% 
   ggplot(aes(x= Count, y= Phylum)) +
   geom_boxplot()
+
+VAN_long <- VAN_rep %>% 
+  gather(key= Phylum, value = Count, -repname, -Method) %>% 
+  mutate(Count = log10(Count + 1))
+  
+VAN_long %>% 
+  ggplot(aes(x= Count, y= Phylum, colour = Phylum)) +
+  geom_boxplot() +
+  facet_wrap(~Method) +
+  xlim(1, 4) +
+  xlab(expression(Log[10]~(Count)))
+
+
+# Practice Plots
+
+VAN_long %>% 
+  ggplot(aes(x= Count, y= Phylum, colour = Phylum)) +
+  geom_point() +
+  facet_wrap(~Method) +
+  xlim(1, 4) +
+  xlab(expression(Log[10]~(Count)))
+
+VAN_long %>% 
+  ggplot(aes(x= Phylum, y= Count, colour = Phylum,
+             show.legend = TRUE, size = 200)) +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  labs(y = "Bacterial Count", title = "Comparison of Bacterial Populations Between Different Faecal Collection Methods") +
+  geom_col() +
+  facet_wrap(~Method)
+
+
+
