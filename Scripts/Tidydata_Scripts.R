@@ -62,8 +62,90 @@ Group_by_Phylum <- OTU_Table_Transpose %>%
 
 view(Group_by_Phylum)
 
+#spread sandpit 
 
-OTU_Table_Spread <- OTU_Table_Transpose %>%
-  spread(Phylum, Counts)
+#test <- OTU_Table_Transpose %>%
+  #spread(test, key = "OTU", value = "Counts")
+
+#view(test1)
+#OTU_Table_Spread <- OTU_Table_Transpose %>%
+  #spread(Phylum, Counts)
 
 view(OTU_Table_Spread)
+
+install.packages("readxl")
+
+library(readxl)
+
+Participant_Info <- read_xlsx("Data/Participant_Information.xlsx")
+
+view(Participant_Info)
+
+VAN_Data <- read_xlsx("Data/VAN_Data.xlsx")
+
+view(VAN_Data)
+
+VAN_rep <- VAN_Data %>% 
+  group_by(Method) %>% 
+  select(-Sample) %>% 
+  #summarise(median(Participant))
+  unite(repname, c("Participant","Replicate"))
+
+VAN_rep %>% 
+  ggplot(aes(x= Method, y= Actinobacteria)) +
+  geom_point()
+
+VAN_rep %>% 
+  ggplot(aes(x= Method, y= Actinobacteria)) +
+  geom_boxplot()
+
+VAN_rep %>% 
+  ggplot(aes(x= Bacteroidetes, y= Method)) +
+  geom_point()
+
+VAN_rep %>% 
+  ggplot(aes(x= Method, y= Firmicutes, colour= repname)) +
+  geom_boxplot()
+
+VAN_rep %>% 
+  ggplot(aes(x= Method, y= repname, colour= Firmicutes)) +
+  geom_boxplot()
+
+#Separate 2 Methods
+
+Blue_bag_Separate <- filter(VAN_rep, Method != "Norgen") %>% 
+  gather(key = "repname", value = "Actinobacteria")
+
+Blue_bag_Separate
+
+Blue_bag_Separate <- VAN_rep %>% 
+  filter(Method != "Norgen") %>% 
+  #select(-Method) %>% 
+  gather(key= Phylum, value = Count, -repname, -Method)
+
+Blue_bag_Separate %>% 
+  ggplot(aes(x= Count, y= Phylum)) +
+  geom_point()
+
+Blue_bag_Separate %>% 
+  ggplot(aes(x= Count, y= Phylum)) +
+  geom_boxplot()
+  
+Norgen_Separate <- VAN_rep %>% 
+  filter(Method == "Norgen") %>% 
+  #select(-Method) %>% 
+  gather(key= Phylum, value = Count, -repname, -Method)
+
+Norgen_Separate %>% 
+  ggplot(aes(x= Count, y= Phylum)) +
+  geom_boxplot()
+
+Norgen_Separate <- VAN_rep %>% 
+  filter(Method == "Norgen") %>% 
+  #select(-Method) %>% 
+  gather(key= Phylum, value = Count, -repname, -Method) %>% 
+  mutate(Count = log10(Count + 1))
+
+Norgen_Separate %>% 
+  ggplot(aes(x= Count, y= Phylum)) +
+  geom_boxplot()
